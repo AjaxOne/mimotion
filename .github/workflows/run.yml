@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '31 10,12,14 * * *'
   workflow_dispatch:
+    inputs:
+      fixed_steps:
+        description: '固定步数（留空则按 5000-8000 随机）'
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -28,6 +33,9 @@ jobs:
         env:
             CONFIG: ${{ secrets.CONFIG }}
             AES_KEY: ${{ secrets.AES_KEY }}
+            MIN_STEP: "5000"
+            MAX_STEP: "8000"
+            FIXED_STEP: ${{ inputs.fixed_steps }}
         run: |
           pip3 install -r requirements.txt
           python3 main.py
