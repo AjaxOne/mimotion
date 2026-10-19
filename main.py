@@ -327,6 +327,12 @@ if __name__ == "__main__":
         print("未配置CONFIG或USER/PWD环境变量，无法执行。请在本地创建.env文件或配置环境变量。")
         exit(1)
 
+    # [custom] 允许用环境变量覆盖 CONFIG 中的步数配置（无需改动仓库 Secret）
+    if os.environ.get("MIN_STEP"):
+        config["MIN_STEP"] = os.environ.get("MIN_STEP")
+    if os.environ.get("MAX_STEP"):
+        config["MAX_STEP"] = os.environ.get("MAX_STEP")
+
     # region 初始化参数
     # 创建推送配置对象
     push_config = push_util.PushConfig(
@@ -347,6 +353,10 @@ if __name__ == "__main__":
         print("未正确配置账号密码，无法执行")
         exit(1)
     min_step, max_step = get_min_max_by_time()
+    # [custom] 手动触发时可用 FIXED_STEP 指定精确步数（忽略时间系数与随机）
+    _fixed_step = (os.environ.get("FIXED_STEP") or "").strip()
+    if _fixed_step:
+        min_step = max_step = int(_fixed_step)
     use_concurrent = config.get('USE_CONCURRENT')
     if use_concurrent is not None and use_concurrent == 'True':
         use_concurrent = True
